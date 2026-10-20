@@ -1,11 +1,91 @@
 [
   {
-    "name": "example",
-    "title": "TODO(author): the first document this industry must produce",
-    "for_each": "select gen_random_uuid() as id, 'Example' as name",
-    "file": "name",
+    "name": "case-file",
+    "title": "Case file",
+    "for_each": "select id, ref from cases where kind in ('complaint', 'grievance', 'disclosure', 'investigation', 'disciplinary', 'performance') order by ref",
+    "file": "ref",
     "sections": [
-      { "title": "Details", "sql": "select 'replace me' as item, $1::text as record_id" }
+      {
+        "title": "The case",
+        "sql": "select ref, kind, title, person, raised_by, handler, country, received_on, status, decision, decision_on from v_cases where id = $1"
+      },
+      {
+        "title": "Allegations and findings",
+        "sql": "select a.n, a.category, a.text, r.name as respondent, a.finding, a.finding_on, a.finding_reasons from allegations a left join people r on r.id = a.respondent_id where a.case_id = $1 order by a.n"
+      },
+      {
+        "title": "Process steps",
+        "note": "The record a fair decision rests on: concerns put, information given, support offered, time to respond.",
+        "sql": "select on_date, kind, due_on, detail from steps where case_id = $1 order by on_date, created_at"
+      },
+      {
+        "title": "Interviews",
+        "sql": "select i.held_on, case when c.protected and i.role = 'discloser' then 'withheld (protected disclosure)' else coalesce(p.name, i.name) end as who, i.role, i.support_person, i.signed from interviews i join cases c on c.id = i.case_id left join people p on p.id = i.person_id where i.case_id = $1 order by i.held_on"
+      },
+      {
+        "title": "Evidence",
+        "sql": "select n, description, source, received_on, location from evidence where case_id = $1 order by n"
+      },
+      {
+        "title": "Gaps in the record",
+        "sql": "select weight, gap, source from v_fairness_gaps where case_id = $1"
+      }
+    ]
+  },
+  {
+    "name": "request-response",
+    "title": "Statutory request: the record",
+    "for_each": "select id, ref from cases where kind in ('flexible-work', 'parental-leave-extension', 'privacy-access', 'statement-of-reasons') order by ref",
+    "file": "ref",
+    "sections": [
+      {
+        "title": "The request",
+        "sql": "select ref, kind, title, person, country, received_on, decision, decision_on, ground_code, reasons from v_cases where id = $1"
+      },
+      {
+        "title": "Deadlines",
+        "sql": "select obligation, due_on, met_on, standing, source from v_deadline_status where case_id = $1 order by due_on"
+      },
+      {
+        "title": "Steps",
+        "sql": "select on_date, kind, detail from steps where case_id = $1 order by on_date"
+      }
+    ]
+  },
+  {
+    "name": "warning-record",
+    "title": "Warning record",
+    "for_each": "select distinct p.id, p.code from people p join warnings w on w.person_id = p.id order by p.code",
+    "file": "code",
+    "sections": [
+      {
+        "title": "Employee",
+        "sql": "select code, name, job_title, team, country from people where id = $1"
+      },
+      {
+        "title": "Warnings",
+        "sql": "select ref, level, issued_on, expires_on, standing, reason, withdrawn_reason from v_warnings where person_id = $1 order by issued_on"
+      }
+    ]
+  },
+  {
+    "name": "monthly-report",
+    "title": "Monthly HR case report",
+    "for_each": "select gen_random_uuid() as id, to_char(current_date, 'YYYY-MM') as month",
+    "file": "month",
+    "sections": [
+      {
+        "title": "Opened and decided in the last 30 days, by kind",
+        "sql": "select kind, count(*) filter (where received_on >= current_date - 30)::int as opened, count(*) filter (where decision_on >= current_date - 30)::int as decided, count(*) filter (where status <> 'closed')::int as open_now from cases where $1::uuid is not null group by kind order by kind"
+      },
+      {
+        "title": "Statutory deadlines",
+        "sql": "select standing, count(*)::int as obligations from v_deadline_status where $1::uuid is not null and kind in ('law', 'guidance') and due_on >= current_date - 30 group by standing order by standing"
+      },
+      {
+        "title": "Allegations by category, 12 months",
+        "sql": "select a.category, count(*)::int as allegations, count(*) filter (where a.finding in ('substantiated', 'partly-substantiated'))::int as substantiated from allegations a join cases c on c.id = a.case_id where $1::uuid is not null and c.received_on >= current_date - 365 group by a.category order by allegations desc"
+      }
     ]
   }
 ]

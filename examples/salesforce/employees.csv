@@ -1,0 +1,5 @@
+Employee Number,First Name,Last Name,Email,Job Title,Department,Manager,Work Country,State,Start Date,Employee Status
+E-4101,Ruby,Hape,ruby.hape@example.com,Dispatch Coordinator,Auckland Warehouse,Craig Bennett,New Zealand,,14/03/2022,Active
+E-4102,Kieran,Walsh,kieran.walsh@example.com,Forklift Operator,Sydney Warehouse,Sarah O'Neill,Australia,NSW,02/08/2023,Active
+E-4103,Mei,Tanaka,mei.tanaka@example.com,Payroll Officer,Finance,Rebecca Moore,New Zealand,,2021-06-01,Active
+E-4104,Josh,Pearce,,Driver,Melbourne Depot,Ben Hartley,Australia,VIC,10/01/2020,Terminated

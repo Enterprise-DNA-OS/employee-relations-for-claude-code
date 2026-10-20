@@ -2,12 +2,67 @@
   {
     "name": "week",
     "title": "This week",
-    "subtitle": "Employee Relations for Claude Code: what needs attention, rendered by npm run view",
+    "subtitle": "What needs a person: statutory deadlines, fairness gaps, cases gone quiet and warnings",
     "sections": [
       {
-        "title": "Needs attention",
-        "note": "TODO(author): point this at the industry's attention view (overdue, stuck, quiet).",
-        "sql": "select 'replace me' as item, 'TODO(author)' as why"
+        "title": "Against the law or guidance",
+        "note": "Statutory deadlines missed and refusals without what the law asks for. Each row names its source.",
+        "sql": "select ref, kind, problem, rule from v_case_problems where kind in ('law', 'guidance') order by ref"
+      },
+      {
+        "title": "Due in the next 7 days",
+        "sql": "select due_on, ref, obligation, title, handler, source from v_deadline_status where met_on is null and case_status <> 'closed' and due_on between current_date and current_date + 7 order by due_on, ref"
+      },
+      {
+        "title": "House rules",
+        "note": "Your own limits: acknowledging, answering, cases with no handler or untouched for too long.",
+        "sql": "select ref, problem from v_case_problems where kind = 'house' order by ref"
+      }
+    ]
+  },
+  {
+    "name": "deadlines",
+    "title": "Deadlines",
+    "subtitle": "Every dated obligation on an open case, soonest first",
+    "sections": [
+      {
+        "title": "Open obligations",
+        "sql": "select due_on, standing, ref, obligation, case_kind, title, handler, kind, source from v_deadline_status where met_on is null and case_status <> 'closed' order by due_on, ref"
+      },
+      {
+        "title": "Challenge windows still open",
+        "note": "After an adverse decision, how long the employee has to raise a grievance or apply to the Fair Work Commission.",
+        "sql": "select window_ends, ref, person, decision, rule from v_windows where window_ends >= current_date order by window_ends"
+      }
+    ]
+  },
+  {
+    "name": "cases",
+    "title": "Open cases",
+    "subtitle": "Every case not yet closed. Protected disclosures never show who raised them.",
+    "sections": [
+      {
+        "title": "Cases",
+        "sql": "select ref, kind, title, person, raised_by, handler, status, received_on, age_days from v_cases where status <> 'closed' order by received_on, ref"
+      },
+      {
+        "title": "Who is carrying what",
+        "sql": "select coalesce(handler, '(no handler)') as handler, count(*)::int as open_cases, max(age_days) as oldest_days from v_cases where status <> 'closed' group by handler order by open_cases desc"
+      }
+    ]
+  },
+  {
+    "name": "warnings",
+    "title": "Warning register",
+    "subtitle": "Every warning in force, soonest to expire first",
+    "sections": [
+      {
+        "title": "Live warnings",
+        "sql": "select person_code as code, person, team, level, issued_on, expires_on, days_left, ref from v_warnings where standing = 'live' order by expires_on"
+      },
+      {
+        "title": "Expired or withdrawn in the last 12 months",
+        "sql": "select person, level, issued_on, expires_on, standing, withdrawn_reason from v_warnings where standing <> 'live' and expires_on >= current_date - 365 order by expires_on desc"
       }
     ]
   }

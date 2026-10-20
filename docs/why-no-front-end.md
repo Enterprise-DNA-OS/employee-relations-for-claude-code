@@ -1,24 +1,26 @@
 # Why there is no front end
 
-Salesforce HR Service is a database with a subscription. The tables underneath it are ordinary: a few entities, a few relationships, a handful of workflows you repeat every week. What you pay for is the layer on top that lets people who do not write SQL get at those tables. Screens, filters, dashboards, forms.
+Salesforce HR Service is a database with a subscription. Underneath are ordinary records: people, cases, allegations, steps, interviews, evidence, decisions, warnings. What you pay for, employee by employee, is the layer on top: a portal, an employee agent, a service desk screen, dashboards.
 
-That layer used to be the whole product, because talking to a database was hard. It is not hard any more. Open this folder in Claude Code, describe what you want, and it writes the query, runs it, and explains the answer. Ask a question the dashboard never had a chart for and you still get an answer.
+That layer was the whole product when talking to a database was hard. It is not hard any more. Open this folder in Claude Code, ask "can we give Daniel a final warning yet?", and it checks the record against the fair process the law judges a decision by and answers, with the gaps and their sources. Ask a question the dashboard never had a report for and you still get an answer.
 
 ## What you gain
 
-- **Better answers.** A dashboard shows what the vendor decided to chart. Here you ask your own question, in your own words, and get it answered against your own data.
-- **No seats.** Everyone who needs to look can look. The bill does not grow with headcount.
-- **Your data in your Postgres.** Plain tables. Back them up, query them from anything, leave any time. There is no export step because there is nothing to leave.
-- **A process that matches you.** When your way of working changes, you add a command. You do not wait for a feature request to clear.
+- **Answers to your own questions.** Who was disciplined within six months of raising a complaint, which managers' teams generate the most cases, which deadlines you miss and under which rule.
+- **No per-employee bill.** Hiring does not raise your software cost.
+- **Your records in your database.** Sensitive case files sit where you choose, not in a vendor's cloud. Back them up, read them from anything, leave any time.
+- **The rules your way.** Change a house rule with one command, add a field in plain language.
 
-## What you give up
+## What a screen gives you that this does not
 
-- **A visual board.** Stages are a table you ask about, not cards you drag.
-- **A phone app.** It runs where Claude Code runs.
-- **A vendor help desk.** This is open source. Enterprise DNA supports the installed version for businesses that want someone to call.
+- **An employee portal and chat.** Employees cannot log their own request or ask a question of an agent. HR logs the case when they email or call, or Enterprise DNA builds a request form or chat on the same database.
+- **Knowledge articles.** Not here. Your policies stay where they are.
+- **Slack and Teams alerts.** Not here; `/attention` each morning instead, or Enterprise DNA connects them.
+- **Drag-and-drop queues.** Cases are something you ask about and move by asking.
+- **Offline use.** It runs where Claude Code runs.
 
 ## Who this fits
 
-Small teams who already use Claude Code, or who would rather learn to ask than learn another interface. If your team needs a screen to look at all day, keep Salesforce HR Service. If you need the answers more than the screens, this is cheaper, faster and yours.
+An employer with a small HR team, or an HR consultancy running casework for several employers, who would rather ask than click and wants every statutory deadline and every fair process step on record. If your employees need a self-service portal, keep one in front and put this behind it as the database, or have Enterprise DNA build the portal on top.
 
 Installed and run for you: https://enterprisedna.co/omni/instead-of/salesforce-hr-service
